@@ -9,7 +9,11 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      DB_HOST: ${DB_HOST:?DB_HOST is required}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_DATABASE: ${DB_DATABASE:?DB_DATABASE is required}
       OILPRICE_API_URL: ${OILPRICE_API_URL:-https://api.istero.com/resource/v2/oilprice}
       OILPRICE_API_TOKEN: ${OILPRICE_API_TOKEN:?OILPRICE_API_TOKEN is required}
     restart: unless-stopped

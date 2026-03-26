@@ -11,11 +11,15 @@ import databaseConfig from './database.config';
       imports: [ConfigModule.forFeature(databaseConfig)],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        url: configService.get('database.url'),
+        host: configService.getOrThrow<string>('database.host'),
+        port: configService.getOrThrow<number>('database.port'),
+        username: configService.getOrThrow<string>('database.username'),
+        password: configService.getOrThrow<string>('database.password'),
+        database: configService.getOrThrow<string>('database.database'),
         // 自动加载实体，避免手动维护实体列表。
         autoLoadEntities: true,
-        // 开发期自动同步表结构；生产环境建议关闭并使用迁移。
-        synchronize: true,
+        // 生产环境禁用自动同步，避免意外变更表结构。
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),

@@ -25,7 +25,11 @@ cp .env.example .env
 再按你的环境修改 `.env`：
 
 ```env
-DATABASE_URL=mysql://user:password@host:3306/dbname
+DB_HOST=mysql
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=test
 
 # 可选，不填则使用代码内默认值
 OILPRICE_API_URL=https://api.istero.com/resource/v2/oilprice
@@ -35,9 +39,35 @@ OILPRICE_API_TOKEN=your_token_here
 ```
 
 变量说明：
-- `DATABASE_URL`：MySQL 连接串（必填）
+- `DB_HOST`：数据库主机（容器名 / IP / 域名）
+- `DB_PORT`：数据库端口（默认 `3306`）
+- `DB_USERNAME`：数据库用户名
+- `DB_PASSWORD`：数据库密码
+- `DB_DATABASE`：数据库名
 - `OILPRICE_API_URL`：上游油价接口地址（可选）
 - `OILPRICE_API_TOKEN`：上游油价接口 Bearer Token（必填，未配置将启动失败）
+
+两种数据库连接示例：
+
+容器模式：
+
+```env
+DB_HOST=mysql
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=test
+```
+
+外部数据库模式：
+
+```env
+DB_HOST=154.222.27.37
+DB_PORT=3307
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=test
+```
 
 ## 安装与启动
 
@@ -78,7 +108,11 @@ cp .env.example .env
 然后确保 `.env` 至少包含：
 
 ```env
-DATABASE_URL=mysql://user:password@host:3306/dbname
+DB_HOST=154.222.27.37
+DB_PORT=3307
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=test
 OILPRICE_API_TOKEN=your_token_here
 ```
 
@@ -107,7 +141,7 @@ docker compose up -d --build
 
 说明：
 - `docker-compose.yml` 不包含 MySQL 服务，不会在 Docker 内新建数据库
-- API 仅使用 `.env` 中的 `DATABASE_URL` 连接你已有数据库
+- API 仅使用 `.env` 中的 `DB_HOST/DB_PORT/DB_USERNAME/DB_PASSWORD/DB_DATABASE` 连接你已有数据库
 - `OILPRICE_API_TOKEN` 为必填项；未配置时 `api` 服务不会启动
 
 查看日志：
@@ -250,7 +284,7 @@ curl "http://localhost:3000/oilprice?keyword=上海"
 
 ## 数据表说明
 
-项目通过 TypeORM 自动建表（当前配置 `synchronize: true`）：
+当前配置为 `synchronize: false`，生产环境不会自动改表结构，请通过迁移或手工 SQL 管理表结构：
 
 - 表名：`oil_price_cache`
 - `id`：主键
