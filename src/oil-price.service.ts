@@ -10,6 +10,9 @@ import { OilPriceCacheEntity } from './oil-price-cache.entity';
 
 type OilPriceDataSource = 'api' | 'database';
 
+const DEFAULT_OILPRICE_API_URL =
+  'https://api.istero.com/resource/v2/oilprice';
+
 export interface OilPricePayload {
   keyword: string;
   source: OilPriceDataSource;
@@ -31,12 +34,20 @@ export class OilPriceService {
     private readonly oilPriceRepository: Repository<OilPriceCacheEntity>,
     private readonly configService: ConfigService,
   ) {
+    // 数据来源（上游）：api.istero.com 油价接口。
     this.oilPriceApiUrl =
       this.configService.get<string>('OILPRICE_API_URL') ??
-      'https://api.istero.com/resource/v2/oilprice';
-    this.oilPriceApiToken =
-      this.configService.get<string>('OILPRICE_API_TOKEN') ??
-      'pzShxpXFRtoNKYFAJRRDHygFPhhWAUdE';
+      DEFAULT_OILPRICE_API_URL;
+
+    const configuredToken = this.configService
+      .get<string>('OILPRICE_API_TOKEN')
+      ?.trim();
+    if (!configuredToken) {
+      throw new Error(
+        'Missing OILPRICE_API_TOKEN. Configure it in environment variables before startup.',
+      );
+    }
+    this.oilPriceApiToken = configuredToken;
   }
 
   // 对外统一查询入口：先读缓存，缓存过期再回源。
