@@ -64,9 +64,8 @@ npm run start:prod
 
 ### 部署方式总览
 
-- 方式 A（推荐生产）：`API 容器 + 外部 MySQL`（云数据库/已有数据库）
-- 方式 B（本地或小型服务）：`API 容器 + Compose 内置 MySQL`
-- 方式 C（服务器更新发布）：`docker compose up -d --build` 滚动更新当前服务
+- 方式 A（推荐）：`API 容器 + 外部 MySQL`（云数据库/已有数据库）
+- 方式 B（服务器更新发布）：`docker compose up -d --build` 滚动更新当前服务
 
 ### 1) 直接构建并运行（连接外部 MySQL）
 
@@ -100,16 +99,15 @@ docker run -d \
   api-collection-server:latest
 ```
 
-### 2) 使用 Docker Compose（一键启动 API + MySQL）
+### 2) 使用 Docker Compose（仅启动 API，连接外部 MySQL）
 
 ```bash
 docker compose up -d --build
 ```
 
 说明：
-- `api` 服务默认访问 `mysql` 容器：`mysql://api_user:api_password@mysql:3306/api_collection`
-- 如果你希望连接外部数据库，设置 `.env` 里的 `DATABASE_URL`，它会覆盖 Compose 默认值
-- 如果你修改了 `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE`，请同步修改 `DATABASE_URL`
+- `docker-compose.yml` 不包含 MySQL 服务，不会在 Docker 内新建数据库
+- API 仅使用 `.env` 中的 `DATABASE_URL` 连接你已有数据库
 - `OILPRICE_API_TOKEN` 为必填项；未配置时 `api` 服务不会启动
 
 查看日志：
@@ -122,12 +120,6 @@ docker compose logs -f api
 
 ```bash
 docker compose down
-```
-
-同时清理 MySQL 数据卷（谨慎）：
-
-```bash
-docker compose down -v
 ```
 
 ### 3) 服务器更新发布（已有部署时）
